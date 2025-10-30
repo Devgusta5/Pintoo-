@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Paleta Pintoo - Light Mode */
+    --background: 58 100% 94%; /* Bege claro #FFFEE1 */
+    --foreground: 23 34% 46%; /* Marrom suave #9E6D4E */
+
+    --card: 0 0% 100%;
+    --card-foreground: 23 34% 46%;
+
+    --popover: 58 100% 96%;
+    --popover-foreground: 23 34% 46%;
+
+    --primary: 335 91% 76%; /* Rosa forte #FA8CB1 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 356 90% 88%; /* Rosa claro #FDC5C9 */
+    --secondary-foreground: 23 34% 46%;
+
+    --muted: 31 33% 90%;
+    --muted-foreground: 23 34% 56%;
+
+    --accent: 31 33% 71%; /* Bege médio #CFB699 */
+    --accent-foreground: 23 34% 26%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 356 50% 90%;
+    --input: 356 50% 92%;
+    --ring: 335 91% 76%;
+
+    --radius: 1rem;
+
+    --sidebar-background: 58 100% 96%;
+    --sidebar-foreground: 23 34% 46%;
+    --sidebar-primary: 335 91% 76%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 356 90% 92%;
+    --sidebar-accent-foreground: 23 34% 46%;
+    --sidebar-border: 356 50% 88%;
+    --sidebar-ring: 335 91% 76%;
+  }
+
+  .dark {
+    /* Paleta Pintoo - Dark Mode */
+    --background: 23 34% 20%; /* Marrom escurecido */
+    --foreground: 58 100% 94%; /* Bege claro */
+
+    --card: 23 34% 24%;
+    --card-foreground: 58 100% 94%;
+
+    --popover: 23 34% 22%;
+    --popover-foreground: 58 100% 94%;
+
+    --primary: 356 80% 82%; /* Rosa claro suavizado */
+    --primary-foreground: 23 34% 20%;
+
+    --secondary: 31 33% 71%; /* Bege médio #CFB699 */
+    --secondary-foreground: 58 100% 94%;
+
+    --muted: 23 34% 30%;
+    --muted-foreground: 31 33% 71%;
+
+    --accent: 335 70% 65%; /* Rosa forte dimmed */
+    --accent-foreground: 58 100% 94%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 58 100% 94%;
+
+    --border: 23 34% 32%;
+    --input: 23 34% 30%;
+    --ring: 356 80% 82%;
+    
+    --sidebar-background: 23 34% 18%;
+    --sidebar-foreground: 58 100% 94%;
+    --sidebar-primary: 356 80% 82%;
+    --sidebar-primary-foreground: 23 34% 20%;
+    --sidebar-accent: 23 34% 28%;
+    --sidebar-accent-foreground: 58 100% 94%;
+    --sidebar-border: 23 34% 26%;
+    --sidebar-ring: 356 80% 82%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-poppins;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+@layer utilities {
+  .hover-lift {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+  
+  .smooth-transition {
+    @apply transition-all duration-300 ease-in-out;
+  }
+}
