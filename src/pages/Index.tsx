@@ -14,21 +14,25 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Allow anonymous access to the index page. If a user is logged in, load their drawings.
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate("/auth");
-      } else {
+      if (session) {
         setUser(session.user);
         loadDrawings(session.user.id);
+      } else {
+        // No session - nothing to load
+        setLoading(false);
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        navigate("/auth");
-      } else {
+      if (session) {
         setUser(session.user);
         loadDrawings(session.user.id);
+      } else {
+        setUser(null);
+        setDrawings([]);
+        setLoading(false);
       }
     });
 
@@ -89,6 +93,7 @@ export default function Index() {
               <p className="text-muted-foreground">Carregando...</p>
             </div>
           ) : (
+            // If user is not logged, drawings will be empty – nothing to map
             drawings.map((drawing) => (
               <Card key={drawing.id} className="hover-lift overflow-hidden">
                 <CardContent className="p-0">
@@ -110,16 +115,22 @@ export default function Index() {
             ))
           )}
         </div>
-
         {!loading && drawings.length === 0 && (
           <div className="text-center py-12">
             <ImageIcon className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <p className="text-xl text-muted-foreground mb-4">
-              Nenhum desenho ainda
+              {user ? 'Nenhum desenho ainda' : 'Você não está logado. Faça login para ver seus desenhos salvos.'}
             </p>
-            <Button onClick={() => navigate("/canvas")}>
-              Criar Primeiro Desenho
-            </Button>
+            <div className="flex items-center justify-center gap-4">
+              <Button onClick={() => navigate("/canvas") }>
+                Criar Desenho
+              </Button>
+              {!user && (
+                <Button variant="outline" onClick={() => navigate("/auth") }>
+                  Entrar / Registrar
+                </Button>
+              )}
+            </div>
           </div>
         )}
       </div>

@@ -20,19 +20,19 @@ export default function Canvas() {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    // Do not force login on page load. Allow anonymous usage of the canvas.
+    // If a session exists, set the user so saving/loading works.
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate("/auth");
-      } else {
+      if (session) {
         setUser(session.user);
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        navigate("/auth");
-      } else {
+      if (session) {
         setUser(session.user);
+      } else {
+        setUser(null);
       }
     });
 
@@ -120,7 +120,14 @@ export default function Canvas() {
 
   const saveCanvas = async () => {
     const canvas = canvasRef.current;
-    if (!canvas || !user) return;
+    if (!canvas) return;
+
+    // Require login only when saving
+    if (!user) {
+      toast.error("Você precisa entrar para salvar. Redirecionando para login...");
+      navigate("/auth");
+      return;
+    }
 
     try {
       canvas.toBlob(async (blob) => {
