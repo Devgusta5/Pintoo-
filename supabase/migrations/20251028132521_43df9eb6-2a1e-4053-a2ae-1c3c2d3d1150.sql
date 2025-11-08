@@ -48,8 +48,10 @@ FOR EACH ROW
 EXECUTE FUNCTION public.handle_updated_at();
 
 -- Create storage bucket for drawings
+-- Create storage bucket for drawings (private by default)
+-- Note: set public to false to avoid exposing files publicly. Use signed URLs to serve images.
 INSERT INTO storage.buckets (id, name, public) 
-VALUES ('drawings', 'drawings', true)
+VALUES ('drawings', 'drawings', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- Storage policies for drawings bucket

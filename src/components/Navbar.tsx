@@ -30,14 +30,18 @@ export const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-sm">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 hover-lift">
+      <div className="container mx-auto h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link 
+          to="/" 
+          className="flex items-center gap-2 hover-lift"
+          aria-label="Ir para página inicial"
+        >
           <Cloud className="h-6 w-6 text-primary" />
-          <span className="text-xl font-semibold">Pintoo</span>
-          <span className="text-sm">☁️</span>
+          <span className="text-xl font-semibold hidden sm:inline">Pintoo</span>
+          <span className="text-sm hidden sm:inline">☁️</span>
         </Link>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:gap-4">
           <ThemeToggle />
           {user && (
             <Button

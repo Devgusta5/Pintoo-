@@ -1,19 +1,37 @@
 import * as React from "react";
 
-const MOBILE_BREAKPOINT = 768;
+const MOBILE_BREAKPOINT = 640; // sm
+const TABLET_BREAKPOINT = 1024; // lg
 
-export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined);
+export function useDevice() {
+  const [device, setDevice] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop');
 
   React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    const updateDevice = () => {
+      const width = window.innerWidth;
+      if (width < MOBILE_BREAKPOINT) {
+        setDevice('mobile');
+      } else if (width < TABLET_BREAKPOINT) {
+        setDevice('tablet');
+      } else {
+        setDevice('desktop');
+      }
     };
-    mql.addEventListener("change", onChange);
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-    return () => mql.removeEventListener("change", onChange);
+
+    // Initial check
+    updateDevice();
+
+    // Add event listener
+    window.addEventListener('resize', updateDevice);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', updateDevice);
   }, []);
 
-  return !!isMobile;
+  return {
+    isMobile: device === 'mobile',
+    isTablet: device === 'tablet',
+    isDesktop: device === 'desktop',
+    device
+  };
 }

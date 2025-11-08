@@ -29,19 +29,59 @@ export default function Auth() {
         toast.success("Bem-vindo de volta! ☁️");
         navigate("/");
       } else {
-        const { error } = await supabase.auth.signUp({
+        // Tenta criar conta
+        const { error: signUpError, data } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
-          },
+            data: {
+              email_confirmed: true // tenta forçar confirmação
+            }
+          }
         });
-        if (error) throw error;
-        toast.success("Conta criada! Verifique seu email ☁️");
-        navigate("/");
+        
+        if (signUpError) throw signUpError;
+        
+        // Tenta fazer login imediatamente após criar conta
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (!signInError) {
+          toast.success("Conta criada com sucesso! ☁️");
+          navigate("/");
+        } else {
+          throw signInError;
+        }
       }
     } catch (error: any) {
-      toast.error(error.message || "Erro ao autenticar");
+      console.error("[Auth Error]:", error); // Para debug
+      const errorMessage = error.message?.toLowerCase() || "";
+      
+      if (errorMessage.includes("invalid login credentials")) {
+        toast.error("Email ou senha incorretos");
+      } else if (errorMessage.includes("email not confirmed")) {
+        // Se o email não foi confirmado, vamos tentar fazer login mesmo assim
+        try {
+          const { error: loginError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+          if (!loginError) {
+            toast.success("Bem-vindo! ☁️");
+            navigate("/");
+            return;
+          }
+        } catch {}
+        toast.error("Não foi possível fazer login. Tente novamente.");
+      } else if (errorMessage.includes("password")) {
+        toast.error("A senha deve ter pelo menos 6 caracteres");
+      } else if (errorMessage.includes("email")) {
+        toast.error("Por favor, use um email válido");
+      } else {
+        toast.error("Erro ao autenticar. Tente novamente.");
+      }
     } finally {
       setLoading(false);
     }

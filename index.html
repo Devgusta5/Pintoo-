@@ -1,26 +1,65 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Pintoo ☁️ - Sua arte nas nuvens</title>
-    <meta name="description" content="Crie, desenhe e salve suas ideias na nuvem com Pintoo - um editor criativo minimalista" />
+    
+    <!-- Meta tags principais -->
+    <meta name="description" content="Crie, desenhe e salve suas ideias na nuvem com Pintoo - um editor criativo minimalista com suporte a desenho livre, pintura e textos." />
+    <meta name="keywords" content="desenho online, editor de texto, arte digital, pintura online, nuvem, criatividade" />
     <meta name="author" content="Pintoo" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#FFB5C2" />
+    
+    <!-- Prevenção de cache para recursos dinâmicos -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Pintoo" />
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#FFB5C2" />
+    
+    <!-- Fonts - preload e display=swap para melhor performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link 
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" 
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pintoo.app/" />
     <meta property="og:title" content="Pintoo ☁️ - Sua arte nas nuvens" />
-    <meta property="og:description" content="Crie, desenhe e salve suas ideias na nuvem com Pintoo" />
-    <!-- <meta property="og:type" content="website" /> -->
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-
+    <meta property="og:description" content="Crie, desenhe e salve suas ideias na nuvem com Pintoo - um editor criativo minimalista com suporte a desenho livre, pintura e textos." />
+    <meta property="og:image" content="https://pintoo.app/og-image.png" />
+    
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-  </head>
+    <meta name="twitter:url" content="https://pintoo.app/" />
+    <meta name="twitter:title" content="Pintoo ☁️ - Sua arte nas nuvens" />
+    <meta name="twitter:description" content="Crie, desenhe e salve suas ideias na nuvem com Pintoo" />
+    <meta name="twitter:image" content="https://pintoo.app/twitter-image.png" />
 
+    <!-- Preload de recursos críticos -->
+    <link rel="preload" href="/src/index.css" as="style" />
+    <link rel="preload" href="/src/main.tsx" as="script" type="module" />
+  </head>
   <body>
+    <noscript>Você precisa habilitar JavaScript para executar esta aplicação.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

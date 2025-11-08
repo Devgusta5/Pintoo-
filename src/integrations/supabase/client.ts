@@ -5,6 +5,14 @@ import type { Database } from './types';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
+// Debug: log URL and key prefix (safe to log, just first 8 chars)
+console.log('[Supabase] Initializing with URL:', SUPABASE_URL);
+console.log('[Supabase] Key prefix:', SUPABASE_PUBLISHABLE_KEY?.slice(0, 8));
+
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  console.error('[Supabase] Missing environment variables. Check .env file.');
+}
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 

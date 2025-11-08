@@ -40,6 +40,43 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      },
+      notes: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string
+          user_id: string
+          title: string
+          content: Json
+          is_deleted: boolean
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          user_id: string
+          title: string
+          content: Json
+          is_deleted?: boolean
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+          title?: string
+          content?: Json
+          is_deleted?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notes_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {
