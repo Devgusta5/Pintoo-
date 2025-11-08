@@ -1,0 +1,29 @@
+# Habilita o módulo de reescrita
+RewriteEngine On
+
+# Se o diretório ou arquivo não existir, redireciona para index.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+
+# Define tipos MIME corretos
+AddType application/javascript .js
+AddType text/css .css
+AddType image/svg+xml .svg
+AddType image/png .png
+AddType image/jpeg .jpg .jpeg
+
+# Headers de segurança
+Header set X-Content-Type-Options "nosniff"
+Header set X-Frame-Options "DENY"
+Header set X-XSS-Protection "1; mode=block"
+
+# Permite CORS
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept"
+
+# Cache para arquivos estáticos
+<FilesMatch "\.(js|css|png|jpg|jpeg|gif|svg)$">
+    Header set Cache-Control "public, max-age=31536000"
+</FilesMatch>
