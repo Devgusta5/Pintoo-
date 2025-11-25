@@ -95,12 +95,6 @@ export default function TextPage() {
   const [currentDocument, setCurrentDocument] = useState<TextDocument | null>(null);
   const [autoSave, setAutoSave] = useState(false);
   const [textStyle, setTextStyle] = useState<keyof typeof FONT_STYLES>("handwriting");
-  const [formattedContent, setFormattedContent] = useState("");
-
-  // Processar formatação do texto
-  useEffect(() => {
-    setFormattedContent(processTextFormatting(content));
-  }, [content]);
 
   // Calcular estatísticas do texto
   useEffect(() => {
@@ -395,6 +389,71 @@ export default function TextPage() {
     return lastSaved.toLocaleDateString('pt-BR');
   };
 
+  // Renderizar texto formatado sem asteriscos
+  const renderFormattedText = (text: string) => {
+    const lines = text.split('\n');
+    
+    return lines.map((line, lineIndex) => {
+      // Padrão: **negrito**, *itálico*, __sublinhado__
+      const parts: React.ReactNode[] = [];
+      let lastIndex = 0;
+      const regex = /\*\*(.*?)\*\*|\*[^\*](.*?)[^\*]\*|__(.*?)__/g;
+      let match;
+
+      while ((match = regex.exec(line)) !== null) {
+        // Texto antes da formatação
+        if (match.index > lastIndex) {
+          parts.push(
+            <span key={`text-${lineIndex}-${lastIndex}`}>
+              {line.substring(lastIndex, match.index)}
+            </span>
+          );
+        }
+
+        // Identifica o tipo de formatação
+        if (match[1] !== undefined) {
+          // **negrito**
+          parts.push(
+            <strong key={`bold-${lineIndex}-${match.index}`} className="font-bold">
+              {match[1]}
+            </strong>
+          );
+        } else if (match[2] !== undefined) {
+          // *itálico*
+          parts.push(
+            <em key={`italic-${lineIndex}-${match.index}`} className="italic">
+              {match[2]}
+            </em>
+          );
+        } else if (match[3] !== undefined) {
+          // __sublinhado__
+          parts.push(
+            <u key={`underline-${lineIndex}-${match.index}`} className="underline">
+              {match[3]}
+            </u>
+          );
+        }
+
+        lastIndex = regex.lastIndex;
+      }
+
+      // Texto restante
+      if (lastIndex < line.length) {
+        parts.push(
+          <span key={`text-${lineIndex}-${lastIndex}`}>
+            {line.substring(lastIndex)}
+          </span>
+        );
+      }
+
+      return (
+        <div key={`line-${lineIndex}`} style={{ minHeight: '2.2em', display: 'block' }}>
+          {parts.length > 0 ? parts : ' '}
+        </div>
+      );
+    });
+  };
+
   return (
     <Layout>
       <div className="flex flex-1 h-[calc(100vh-64px)]">
@@ -598,52 +657,51 @@ export default function TextPage() {
                       marginLeft: "2rem"
                     }}
                   />
-                  
-                  {/* Textarea sobre as linhas */}
-                  <Textarea
-                    ref={textareaRef}
-                    value={content}
-                    onChange={handleContentChange}
-                    onKeyDown={handleKeyDown}
-                    placeholder={`Comece a escrever suas ideias... ✍️
+
+                  {/* Container do textarea + texto renderizado */}
+                  <div className="relative w-full h-full">
+                    {/* Textarea INVISÍVEL (para input) */}
+                    <Textarea
+                      ref={textareaRef}
+                      value={content}
+                      onChange={handleContentChange}
+                      onKeyDown={handleKeyDown}
+                      placeholder={`Comece a escrever suas ideias... ✍️
 
 Dica: Use as ferramentas acima para formatar seu texto ou os atalhos:
 • Ctrl+B para Negrito
 • Ctrl+I para Itálico  
 • Ctrl+U para Sublinhado
 • Ctrl+L para Lista`}
-                    className="w-full h-full resize-none border-none bg-transparent shadow-none focus-visible:ring-0 px-12 py-8 absolute inset-0 z-20 text-foreground placeholder:text-muted-foreground"
-                    style={{
-                      ...FONT_STYLES[textStyle],
-                      outline: "none",
-                      caretColor: "#3b82f6",
-                      marginLeft: "2rem",
-                      paddingLeft: "1rem",
-                      lineHeight: "2.2",
-                      background: "transparent"
-                    }}
-                  />
-                  
-                  {/* Texto formatado renderizado (apenas para visualização) */}
-                  {content && (
-                    <div 
-                      aria-hidden="true"
-                      className="w-full h-full px-12 py-8 whitespace-pre-wrap absolute inset-0 pointer-events-none select-none z-10"
+                      className="w-full h-full resize-none border-none shadow-none focus-visible:ring-0 absolute inset-0 z-20"
                       style={{
                         ...FONT_STYLES[textStyle],
-                        marginLeft: "2rem",
-                        paddingLeft: "1rem",
+                        outline: "none",
+                        caretColor: "#3b82f6",
+                        color: "transparent",
+                        backgroundColor: "transparent",
+                        padding: "2rem 3rem 2rem 4rem",
                         lineHeight: "2.2",
-                        color: "transparent"
+                        resize: "none",
+                        paddingLeft: "4rem"
+                      }}
+                    />
+
+                    {/* TEXTO FORMATADO VISÍVEL (sobreposição) */}
+                    <div 
+                      className="absolute inset-0 w-full h-full z-10 pointer-events-none select-none overflow-hidden text-foreground"
+                      style={{
+                        ...FONT_STYLES[textStyle],
+                        padding: "2rem 3rem 2rem 4rem",
+                        lineHeight: "2.2",
+                        paddingLeft: "4rem",
+                        whiteSpace: "pre-wrap",
+                        wordWrap: "break-word"
                       }}
                     >
-                      {content.split('\n').map((line, index) => (
-                        <div key={index} style={{ minHeight: '2.2em' }}>
-                          {line || ' '}
-                        </div>
-                      ))}
+                      {renderFormattedText(content)}
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -668,7 +726,7 @@ Dica: Use as ferramentas acima para formatar seu texto ou os atalhos:
             <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
               <div className="flex items-center gap-2 text-sm text-primary">
                 <span className="font-semibold">💡 Dicas:</span>
-                <span>O texto respeita as linhas do caderno automaticamente. Use Enter para nova linha!</span>
+                <span>Use **negrito**, *itálico* e __sublinhado__ para formatar! A visualização aparece em tempo real.</span>
               </div>
             </div>
           </div>

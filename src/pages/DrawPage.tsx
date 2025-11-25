@@ -17,7 +17,9 @@ import {
   LucideIcon,
   Palette,
   Zap,
-  X
+  X,
+  MessageCircle,
+  Send
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Sidebar } from "../components/Sidebar";
@@ -56,6 +58,10 @@ export default function DrawPage() {
   const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null);
   const [activePalette, setActivePalette] = useState(0);
   const [showColorPalettes, setShowColorPalettes] = useState(false);
+  const [showAIChat, setShowAIChat] = useState(false);
+  const [aiMessages, setAiMessages] = useState<Array<{ from: "user" | "bot"; text: string }>>([]);
+  const [aiInput, setAiInput] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { id } = useParams();
 
@@ -361,6 +367,36 @@ export default function DrawPage() {
     toast.success("Canvas limpo!");
   };
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [aiMessages]);
+
+  const sendAIMessage = () => {
+    if (!aiInput.trim()) return;
+
+    const userMsg = { from: "user" as const, text: aiInput.trim() };
+    setAiMessages(m => [...m, userMsg]);
+    setAiInput("");
+
+    // Simula resposta da IA após 800ms
+    setTimeout(() => {
+      const responses = [
+        "Que legal! Parece que você está criando algo incrível! 🎨",
+        "Legal! Você já experimentou usar diferentes pintool's para isso?",
+        "Interessante! Que tipo de desenho você está fazendo?",
+        "Adorei! Quer dica de cores que combinam bem?",
+        "Bacana! Você já pensou em aumentar um pouco a espessura do pintoo?",
+        "Muito criativo! Continue assim, ficará ótimo! ✨"
+      ];
+      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      setAiMessages(m => [...m, { from: "bot", text: randomResponse }]);
+    }, 800);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -523,87 +559,164 @@ export default function DrawPage() {
         </div>
       </div>
 
-      
-        {/* Área do Canvas */}
-        <div className="flex-1 p-4">
-          <div className="h-full bg-white rounded-lg overflow-hidden border border-border shadow-sm relative">
-            <canvas
-              ref={canvasRef}
-              onMouseDown={startDrawing}
-              onMouseUp={stopDrawing}
-              onMouseMove={draw}
-              onMouseLeave={stopDrawing}
-              className="cursor-crosshair w-full h-full touch-none bg-white"
-            />
-            {saving && (
-              <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-                <div className="flex flex-col items-center">
-                  <div className="h-8 w-8 border-4 border-t-transparent border-primary rounded-full animate-spin mb-2" />
-                  <span className="text-foreground">Salvando...</span>
-                </div>
+      {/* Área do Canvas */}
+      <div className="flex-1 p-4">
+        <div className="h-full bg-white rounded-lg overflow-hidden border border-border shadow-sm relative">
+          <canvas
+            ref={canvasRef}
+            onMouseDown={startDrawing}
+            onMouseUp={stopDrawing}
+            onMouseMove={draw}
+            onMouseLeave={stopDrawing}
+            className="cursor-crosshair w-full h-full touch-none bg-white"
+          />
+          {saving && (
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+              <div className="flex flex-col items-center">
+                <div className="h-8 w-8 border-4 border-t-transparent border-primary rounded-full animate-spin mb-2" />
+                <span className="text-foreground">Salvando...</span>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
+      </div>
 
-        {/* Seletor de Paletas */}
-        {showColorPalettes && (
-          <>
-            {/* Overlay de fundo */}
-            <div 
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50" 
-              onClick={() => setShowColorPalettes(false)}
-            />
-            
-            {/* Modal */}
-            <div 
-              className="fixed inset-x-0 bottom-0 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50 w-full sm:max-w-lg"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="bg-popover m-0 sm:m-4 rounded-t-xl sm:rounded-xl border shadow-lg">
-                {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b">
-                  <h3 className="text-lg font-semibold text-foreground">Escolher Cor</h3>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full"
-                    onClick={() => setShowColorPalettes(false)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
+      {/* Seletor de Paletas */}
+      {showColorPalettes && (
+        <>
+          {/* Overlay de fundo */}
+          <div 
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50" 
+            onClick={() => setShowColorPalettes(false)}
+          />
+          
+          {/* Modal */}
+          <div 
+            className="fixed inset-x-0 bottom-0 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50 w-full sm:max-w-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-popover m-0 sm:m-4 rounded-t-xl sm:rounded-xl border shadow-lg">
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b">
+                <h3 className="text-lg font-semibold text-foreground">Escolher Cor</h3>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full"
+                  onClick={() => setShowColorPalettes(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
 
-                {/* Conteúdo */}
-                <div className="p-4 max-h-[60vh] sm:max-h-[70vh] overflow-y-auto">
-                  <div className="space-y-6">
-                    {COLOR_PALETTES.map((palette, index) => (
-                      <div key={palette.name} className="space-y-3">
-                        <h4 className="text-sm font-medium text-muted-foreground">{palette.name}</h4>
-                        <div className="grid grid-cols-6 sm:grid-cols-8 gap-3">
-                          {palette.colors.map((c) => (
-                            <button
-                              key={c}
-                              onClick={() => {
-                                setColor(c);
-                                setActivePalette(index);
-                                setShowColorPalettes(false);
-                              }}
-                              className={`w-10 h-10 rounded-full border-2 transition-all hover:scale-110 active:scale-95 ${
-                                color === c ? "border-primary shadow-lg" : "border-border"
-                              }`}
-                              style={{ backgroundColor: c }}
-                            />
-                          ))}
-                        </div>
+              {/* Conteúdo */}
+              <div className="p-4 max-h-[60vh] sm:max-h-[70vh] overflow-y-auto">
+                <div className="space-y-6">
+                  {COLOR_PALETTES.map((palette, index) => (
+                    <div key={palette.name} className="space-y-3">
+                      <h4 className="text-sm font-medium text-muted-foreground">{palette.name}</h4>
+                      <div className="grid grid-cols-6 sm:grid-cols-8 gap-3">
+                        {palette.colors.map((c) => (
+                          <button
+                            key={c}
+                            onClick={() => {
+                              setColor(c);
+                              setActivePalette(index);
+                              setShowColorPalettes(false);
+                            }}
+                            className={`w-10 h-10 rounded-full border-2 transition-all hover:scale-110 active:scale-95 ${
+                              color === c ? "border-primary shadow-lg" : "border-border"
+                            }`}
+                            style={{ backgroundColor: c }}
+                          />
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
-          </>
+          </div>
+        </>
+      )}
+
+      {/* Chat IA Flutuante - Canto Inferior Direito */}
+      <div className="fixed bottom-6 right-6 z-40">
+        {!showAIChat ? (
+          <Button
+            onClick={() => setShowAIChat(true)}
+            className="rounded-full h-14 w-14 shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
+            title="Chat com IA"
+          >
+            <MessageCircle className="h-6 w-6" />
+          </Button>
+        ) : (
+          <div className="bg-popover border border-border rounded-xl shadow-2xl w-80 max-h-96 flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b">
+              <h3 className="font-semibold text-foreground flex items-center gap-2">
+                <MessageCircle className="h-5 w-5 text-primary" />
+                Assistente IA
+              </h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setShowAIChat(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Mensagens */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-background/50">
+              {aiMessages.length === 0 && (
+                <div className="text-sm text-muted-foreground text-center py-8">
+                  Oi! 👋 Como posso ajudar com seu desenho?
+                </div>
+              )}
+              {aiMessages.map((msg, i) => (
+                <div
+                  key={i}
+                  className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                    className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
+                      msg.from === "user"
+                        ? "bg-primary text-primary-foreground rounded-br-none"
+                        : "bg-muted text-foreground rounded-bl-none"
+                    }`}
+                  >
+                    {msg.text}
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input */}
+            <div className="border-t p-3 flex gap-2">
+              <input
+                type="text"
+                value={aiInput}
+                onChange={(e) => setAiInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") sendAIMessage();
+                }}
+                placeholder="Digite sua mensagem..."
+                className="flex-1 px-3 py-2 rounded-lg border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-primary/50"
+              />
+              <Button
+                size="icon"
+                className="h-10 w-10 rounded-lg shrink-0"
+                onClick={sendAIMessage}
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         )}
       </div>
+    </div>
   );
 }
